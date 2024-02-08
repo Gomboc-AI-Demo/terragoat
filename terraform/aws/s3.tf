@@ -94,7 +94,7 @@ resource "aws_s3_bucket" "data_science" {
     enabled = true
   }
   logging {
-    target_bucket = "${aws_s3_bucket.logs.id}"
+    target_bucket = aws_s3_bucket.logs.id
     target_prefix = "log/"
   }
   force_destroy = true
@@ -120,7 +120,7 @@ resource "aws_s3_bucket" "logs" {
     rule {
       apply_server_side_encryption_by_default {
         sse_algorithm     = "aws:kms"
-        kms_master_key_id = "${aws_kms_key.logs_key.arn}"
+        kms_master_key_id = aws_kms_key.logs_key.arn
       }
     }
   }
@@ -138,4 +138,24 @@ resource "aws_s3_bucket" "logs" {
     git_repo             = "terragoat"
     yor_trace            = "01946fe9-aae2-4c99-a975-e9b0d3a4696c"
   })
+}
+resource "aws_s3_bucket_public_access_block" "my_aws_s3_bucket_public_access_block_data" {
+  ignore_public_acls = true
+  bucket             = aws_s3_bucket.data.id
+}
+resource "aws_s3_bucket_public_access_block" "my_aws_s3_bucket_public_access_block_financials" {
+  ignore_public_acls = true
+  bucket             = aws_s3_bucket.financials.id
+}
+resource "aws_s3_bucket_public_access_block" "my_aws_s3_bucket_public_access_block_operations" {
+  ignore_public_acls = true
+  bucket             = aws_s3_bucket.operations.id
+}
+resource "aws_s3_bucket_public_access_block" "my_aws_s3_bucket_public_access_block_data_science" {
+  ignore_public_acls = true
+  bucket             = aws_s3_bucket.data_science.id
+}
+resource "aws_s3_bucket_public_access_block" "my_aws_s3_bucket_public_access_block_logs" {
+  ignore_public_acls = true
+  bucket             = aws_s3_bucket.logs.id
 }
