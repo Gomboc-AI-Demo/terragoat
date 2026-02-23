@@ -14,12 +14,12 @@ resource "aws_db_instance" "default" {
   username                = "admin"
   password                = var.password
   apply_immediately       = true
-  multi_az                = false
+  multi_az                = true
   backup_retention_period = 0
   storage_encrypted       = false
   skip_final_snapshot     = true
-  monitoring_interval     = 0
-  publicly_accessible     = true
+  monitoring_interval     = 60
+  publicly_accessible     = false
 
   tags = merge({
     Name        = "${local.resource_prefix.value}-rds"
@@ -37,8 +37,11 @@ resource "aws_db_instance" "default" {
 
   # Ignore password changes from tf plan diff
   lifecycle {
-    ignore_changes = ["password"]
+    ignore_changes = ["password", engine_version]
   }
+  deletion_protection = true
+  monitoring_role_arn = "REPLACE_ME"
+  enabled_cloudwatch_logs_exports = ["audit", "error", "slowquery"]
 }
 
 resource "aws_db_option_group" "default" {
@@ -411,6 +414,14 @@ EOF
     git_repo             = "terragoat"
     yor_trace            = "f7999d4e-c983-43ee-bd88-7903a6f8483e"
   })
+  root_block_device {
+    encrypted = true
+    delete_on_termination = false
+  }
+  disable_api_termination = true
+  metadata_options {
+    http_tokens = "required"
+  }
 }
 
 output "db_app_public_dns" {

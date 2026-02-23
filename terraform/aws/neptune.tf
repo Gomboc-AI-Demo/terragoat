@@ -17,6 +17,8 @@ resource "aws_neptune_cluster" "default" {
     git_repo             = "terragoat"
     yor_trace            = "0d4cbb85-73ed-4ca0-b1da-296e4185f34e"
   }
+  deletion_protection = true
+  enable_cloudwatch_logs_exports = ["audit"]
 }
 
 resource "aws_neptune_cluster_instance" "default" {
